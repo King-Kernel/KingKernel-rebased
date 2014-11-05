@@ -6195,9 +6195,6 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 	int want_affine = 0;
 	int sync = wake_flags & WF_SYNC;
 
-	if (p->nr_cpus_allowed == 1)
-		return prev_cpu;
-
 	if (sd_flag & SD_BALANCE_WAKE) {
 		/*
 		 * do wake_cap unconditionally as it causes task and cpu
