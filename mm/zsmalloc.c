@@ -255,6 +255,7 @@ struct zs_pool {
 	gfp_t flags;	/* allocation flags used when growing pool */
 	atomic_long_t pages_allocated;
 
+	struct zs_pool_stats stats;
 #ifdef CONFIG_ZSMALLOC_STAT
 	struct dentry *stat_dentry;
 #endif
@@ -1608,7 +1609,7 @@ struct zs_compact_control {
 	 /* Starting object index within @s_page which used for live object
 	  * in the subpage. */
 	int index;
-	/* how many of objects are migrated */
+	/* How many of objects were migrated */
 	int nr_migrated;
 };
 
@@ -1620,7 +1621,6 @@ static int migrate_zspage(struct zs_pool *pool, struct size_class *class,
 	struct page *s_page = cc->s_page;
 	struct page *d_page = cc->d_page;
 	unsigned long index = cc->index;
-	int nr_migrated = 0;
 	int ret = 0;
 
 	while (1) {
@@ -1647,13 +1647,12 @@ static int migrate_zspage(struct zs_pool *pool, struct size_class *class,
 		record_obj(handle, free_obj);
 		unpin_tag(handle);
 		obj_free(pool, class, used_obj);
-		nr_migrated++;
+		cc->nr_migrated++;
 	}
 
 	/* Remember last position in this iteration */
 	cc->s_page = s_page;
 	cc->index = index;
-	cc->nr_migrated = nr_migrated;
 
 	return ret;
 }
@@ -1706,15 +1705,37 @@ static struct page *isolate_source_page(struct size_class *class)
 	return page;
 }
 
-static unsigned long __zs_compact(struct zs_pool *pool,
-				struct size_class *class)
+/*
+ *
+ * Based on the number of unused allocated objects calculate
+ * and return the number of pages that we can free.
+ *
+ * Should be called under class->lock.
+ */
+static unsigned long zs_can_compact(struct size_class *class)
+{
+	unsigned long obj_wasted;
+
+	if (!zs_stat_get(class, CLASS_ALMOST_EMPTY))
+		return 0;
+
+	obj_wasted = zs_stat_get(class, OBJ_ALLOCATED) -
+		zs_stat_get(class, OBJ_USED);
+
+	obj_wasted /= get_maxobj_per_zspage(class->size,
+			class->pages_per_zspage);
+
+	return obj_wasted * get_pages_per_zspage(class->size);
+}
+
+static void __zs_compact(struct zs_pool *pool, struct size_class *class)
 {
 	int nr_to_migrate;
 	struct zs_compact_control cc;
 	struct page *src_page;
 	struct page *dst_page = NULL;
-	unsigned long nr_total_migrated = 0;
 
+	cc.nr_migrated = 0;
 	spin_lock(&class->lock);
 	while ((src_page = isolate_source_page(class))) {
 
@@ -1735,8 +1756,6 @@ static unsigned long __zs_compact(struct zs_pool *pool,
 				break;
 
 			putback_zspage(pool, class, dst_page);
-			nr_total_migrated += cc.nr_migrated;
-			nr_to_migrate -= cc.nr_migrated;
 		}
 
 		/* Stop if we couldn't find slot */
@@ -1746,7 +1765,6 @@ static unsigned long __zs_compact(struct zs_pool *pool,
 		putback_zspage(pool, class, dst_page);
 		putback_zspage(pool, class, src_page);
 		spin_unlock(&class->lock);
-		nr_total_migrated += cc.nr_migrated;
 		cond_resched();
 		spin_lock(&class->lock);
 	}
@@ -1754,15 +1772,14 @@ static unsigned long __zs_compact(struct zs_pool *pool,
 	if (src_page)
 		putback_zspage(pool, class, src_page);
 
-	spin_unlock(&class->lock);
+	pool->stats.num_migrated += cc.nr_migrated;
 
-	return nr_total_migrated;
+	spin_unlock(&class->lock);
 }
 
 unsigned long zs_compact(struct zs_pool *pool)
 {
 	int i;
-	unsigned long nr_migrated = 0;
 	struct size_class *class;
 
 	for (i = zs_size_classes - 1; i >= 0; i--) {
@@ -1771,12 +1788,18 @@ unsigned long zs_compact(struct zs_pool *pool)
 			continue;
 		if (class->index != i)
 			continue;
-		nr_migrated += __zs_compact(pool, class);
+		__zs_compact(pool, class);
 	}
 
-	return nr_migrated;
+	return pool->stats.num_migrated;
 }
 EXPORT_SYMBOL_GPL(zs_compact);
+
+void zs_pool_stats(struct zs_pool *pool, struct zs_pool_stats *stats)
+{
+	memcpy(stats, &pool->stats, sizeof(struct zs_pool_stats));
+}
+EXPORT_SYMBOL_GPL(zs_pool_stats);
 
 /**
  * zs_create_pool - Creates an allocation pool to work from.
