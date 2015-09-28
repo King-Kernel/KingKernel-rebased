@@ -562,20 +562,18 @@ struct task_cputime_atomic {
 #endif
 
 /*
- * Disable preemption until the scheduler is running.
- * Reset by start_kernel()->sched_init()->init_idle().
+ * Disable preemption until the scheduler is running -- use an unconditional
+ * value so that it also works on !PREEMPT_COUNT kernels.
  *
- * We include PREEMPT_ACTIVE to avoid cond_resched() from working
- * before the scheduler is active -- see should_resched().
+ * Reset by start_kernel()->sched_init()->init_idle()->init_idle_preempt_count().
  */
-#define INIT_PREEMPT_COUNT	(PREEMPT_DISABLED + PREEMPT_ACTIVE)
+#define INIT_PREEMPT_COUNT	PREEMPT_OFFSET
 
 /**
  * struct thread_group_cputimer - thread group interval timer counts
  * @cputime:		thread group interval timers.
  * @running:		non-zero when there are timers running and
- * 			@cputime receives updates.
- * @lock:		lock for fields in this struct.
+ *			@cputime receives updates.
  *
  * This structure contains the version of task_cputime, above, that is
  * used for thread group CPU timer calculations.
