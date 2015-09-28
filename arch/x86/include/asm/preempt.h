@@ -34,7 +34,7 @@ static __always_inline void preempt_count_set(int pc)
 	(task_thread_info(p)->saved_preempt_count & ~PREEMPT_NEED_RESCHED)
 
 #define init_task_preempt_count(p) do { \
-	task_thread_info(p)->saved_preempt_count = PREEMPT_DISABLED; \
+	task_thread_info(p)->saved_preempt_count = FORK_PREEMPT_COUNT; \
 } while (0)
 
 #define init_idle_preempt_count(p, cpu) do { \
