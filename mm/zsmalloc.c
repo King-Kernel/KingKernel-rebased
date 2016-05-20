@@ -1892,7 +1892,7 @@ struct zs_pool *zs_create_pool(const char *name)
 		prev_class = class;
 	}
 
-	if (zs_pool_stat_create(pool, name))
+	if (zs_pool_stat_create(name, pool))
 		goto err;
 
 	return pool;
