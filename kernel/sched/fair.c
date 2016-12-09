@@ -4421,7 +4421,7 @@ static inline void hrtick_update(struct rq *rq)
 static bool cpu_overutilized(int cpu);
 static inline unsigned long boosted_cpu_util(int cpu);
 #else
-#define boosted_cpu_util(cpu) cpu_util(cpu)
+#define boosted_cpu_util(cpu) cpu_util_freq(cpu)
 #endif
 
 #ifdef CONFIG_CPU_FREQ_GOV_SCHED
@@ -5714,7 +5714,7 @@ schedtune_task_margin(struct task_struct *task)
 static inline unsigned long
 boosted_cpu_util(int cpu)
 {
-	unsigned long util = cpu_util(cpu);
+	unsigned long util = cpu_util_freq(cpu);
 	long margin = schedtune_cpu_margin(util, cpu);
 
 	trace_sched_boost_cpu(cpu, util, margin);
