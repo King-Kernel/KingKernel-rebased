@@ -5629,12 +5629,6 @@ static inline int select_energy_cpu_idx(struct energy_env *eenv)
 	 */
 	eenv->next_idx = EAS_CPU_PRV;
 
-	trace_sched_energy_diff(eenv->p,
-			eenv->src_cpu, eenv->dst_cpu, eenv->util_delta,
-			eenv->nrg.before, eenv->nrg.after, eenv->nrg.diff,
-			eenv->cap.before, eenv->cap.after, eenv->cap.delta,
-			eenv->nrg.delta, eenv->payoff);
-
 	/*
 	 * Compare the other CPU candidates to find a CPU which can be
 	 * more energy efficient then EAS_CPU_PRV
