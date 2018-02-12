@@ -56,28 +56,5 @@
  *
  * Given a floating point value f it's .16 bit point is (int)(f*(1<<16))*/
 typedef unsigned int FixPoint1616_t;
-/*
-#if !defined(STDINT_H) &&  !defined(_GCC_STDINT_H) \
-	&& !defined(_STDINT_H) && !defined(_LINUX_TYPES_H)
-
-#pragma message("Please review type definition of STDINT define for your \
-platform and add to list above ")
-*/
-/*
- *  target platform do not provide stdint or use a different #define than above
- *  to avoid seeing the message below addapt the #define list above or implement
- *  all type and delete these pragma
- */
-
-typedef unsigned int uint32_t;
-typedef int int32_t;
-
-typedef unsigned short uint16_t;
-typedef short int16_t;
-
-typedef unsigned char uint8_t;
-
-typedef signed char int8_t;
-
 
 #endif /* VL53L0_TYPES_H_ */
