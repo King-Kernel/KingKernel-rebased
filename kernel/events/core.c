@@ -832,11 +832,10 @@ static int perf_mux_hrtimer_restart(struct perf_cpu_context *cpuctx)
 	raw_spin_lock_irqsave(&cpuctx->hrtimer_lock, flags);
 	if (!cpuctx->hrtimer_active) {
 		cpuctx->hrtimer_active = 1;
-		__hrtimer_start_range_ns(timer, cpuctx->hrtimer_interval,
-				0, HRTIMER_MODE_REL_PINNED, 0);
+		hrtimer_forward_now(timer, cpuctx->hrtimer_interval);
+		hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED);
 	}
 	raw_spin_unlock_irqrestore(&cpuctx->hrtimer_lock, flags);
-
 	return 0;
 }
 
@@ -6517,9 +6516,8 @@ static void perf_swevent_start_hrtimer(struct perf_event *event)
 	} else {
 		period = max_t(u64, 10000, hwc->sample_period);
 	}
-	__hrtimer_start_range_ns(&hwc->hrtimer,
-			ns_to_ktime(period), 0,
-			HRTIMER_MODE_REL_PINNED, 0);
+	hrtimer_start(&hwc->hrtimer, ns_to_ktime(period),
+		      HRTIMER_MODE_REL_PINNED);
 }
 
 static void perf_swevent_cancel_hrtimer(struct perf_event *event)
