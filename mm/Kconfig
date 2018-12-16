@@ -722,3 +722,9 @@ config DIRTY_BACKGROUND_RATIO
 	  The percentage of memory which may be used for dirty pages before the
 	  kernel's background writeback threads start committing the dirty data
 	  to disk.
+
+config SWAPPINESS
+	int "default swappiness percentage"
+	default 60
+	help
+	  This sets the VM_SWAPPINESS value to be used for the swapfile.
