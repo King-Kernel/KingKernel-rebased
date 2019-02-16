@@ -622,6 +622,17 @@ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
 KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
 KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
 
+ifdef CONFIG_POLLY_CLANG
+KBUILD_CFLAGS += -mllvm -polly \
+		 -mllvm -polly-run-dce \
+		 -mllvm -polly-run-inliner \
+		 -mllvm -polly-opt-fusion=max \
+		 -mllvm -polly-ast-use-context \
+		 -mllvm -polly-detect-keep-going \
+		 -mllvm -polly-vectorizer=stripmine \
+		 -mllvm -polly-invariant-load-hoisting
+endif
+
 # Optimize for Kryo
 KBUILD_CFLAGS += -mcpu=kryo
 else
