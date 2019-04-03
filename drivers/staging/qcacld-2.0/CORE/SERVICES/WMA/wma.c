@@ -14226,7 +14226,7 @@ static int32_t wma_txrx_fw_stats_reset(tp_wma_handle wma_handle,
 	}
 	vos_mem_zero(&req, sizeof(req));
 	req.stats_type_reset_mask = value;
-	ol_txrx_fw_stats_get(vdev, &req);
+	ol_txrx_fw_stats_get(vdev, &req, false);
 
 	return 0;
 }
@@ -14299,7 +14299,7 @@ static int32_t wma_set_txrx_fw_stats_level(tp_wma_handle wma_handle,
 			value);
 		return -EINVAL;
 	}
-	ol_txrx_fw_stats_get(vdev, &req);
+	ol_txrx_fw_stats_get(vdev, &req, true);
 
 	return 0;
 }
@@ -27435,7 +27435,7 @@ VOS_STATUS wma_stats_ext_req(void *wda_handle,
 	tp_wma_handle wma = (tp_wma_handle)wda_handle;
 	wmi_req_stats_ext_cmd_fixed_param *cmd;
 	wmi_buf_t buf;
-	u_int16_t len;
+	size_t len;
 	u_int8_t *buf_ptr;
 
 	len = sizeof(*cmd) + WMI_TLV_HDR_SIZE +
@@ -28939,6 +28939,18 @@ static VOS_STATUS wma_nan_req(void *wda_handle, tpNanRequest nan_req)
 	nan_data_len = nan_req->request_data_len;
 	nan_data_len_aligned = roundup(nan_req->request_data_len,
 				sizeof(u_int32_t));
+	if (nan_data_len_aligned < nan_req->request_data_len) {
+		WMA_LOGE("%s: integer overflow while rounding up data_len",
+			 __func__);
+		return VOS_STATUS_E_NOMEM;
+	}
+
+	if (nan_data_len_aligned > WMA_SVC_MSG_MAX_SIZE - WMI_TLV_HDR_SIZE) {
+		WMA_LOGE("%s: wmi_max_msg_size overflow for given datalen",
+			 __func__);
+		return VOS_STATUS_E_NOMEM;
+	}
+
 	len += WMI_TLV_HDR_SIZE + nan_data_len_aligned;
 	buf = wmi_buf_alloc(wma_handle->wmi_handle, len);
 	if (!buf) {
