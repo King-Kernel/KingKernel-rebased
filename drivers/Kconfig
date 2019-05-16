@@ -192,6 +192,8 @@ source "drivers/ras/Kconfig"
 
 source "drivers/thunderbolt/Kconfig"
 
+source "drivers/android/Kconfig"
+
 source "drivers/sensors/Kconfig"
 
 source "drivers/htc_debug/stability/Kconfig"
