@@ -22,7 +22,7 @@ ui_print() {
 
 # abort ["<text>" [...]]
 abort() {
-  ui_print " " "$@";
+  ui_print " " "!! $*; aborting." " ";
   exit 1;
 }
 
@@ -67,7 +67,7 @@ split_boot() {
   local dumpfail;
 
   if [ ! -e "$(echo $block | cut -d\  -f1)" ]; then
-    abort "Invalid partition. Aborting...";
+    abort "Invalid partition";
   fi;
   if [ "$(echo $block | grep ' ')" ]; then
     block=$(echo $block | cut -d\  -f1);
@@ -133,7 +133,7 @@ split_boot() {
   fi;
 
   if [ $? != 0 -o "$dumpfail" ]; then
-    abort "Dumping/splitting image failed. Aborting...";
+    abort "Dumping/splitting image failed";
   fi;
   cd $home;
 }
@@ -154,7 +154,7 @@ unpack_ramdisk() {
   if [ -f ramdisk.cpio ]; then
     comp=$($bin/magiskboot decompress ramdisk.cpio 2>&1 | grep -v 'raw' | sed -n 's;.*\[\(.*\)\];\1;p');
   else
-    abort "No ramdisk found to unpack. Aborting...";
+    abort "No ramdisk found to unpack"
   fi;
   if [ "$comp" ]; then
     mv -f ramdisk.cpio ramdisk.cpio.$comp;
@@ -172,7 +172,7 @@ unpack_ramdisk() {
   cd $ramdisk;
   EXTRACT_UNSAFE_SYMLINKS=1 cpio -d -F $split_img/ramdisk.cpio -i;
   if [ $? != 0 -o ! "$(ls)" ]; then
-    abort "Unpacking ramdisk failed. Aborting...";
+    abort "Unpacking ramdisk failed"
   fi;
   if [ -d "$home/rdtmp" ]; then
     cp -af $home/rdtmp/* .;
@@ -180,7 +180,9 @@ unpack_ramdisk() {
 }
 ### dump_boot (dump and split image, then extract ramdisk)
 dump_boot() {
+  ui_print "  • Unpacking boot image";
   split_boot;
+  ui_print "  • Unpacking ramdisk";
   unpack_ramdisk;
 }
 ###
@@ -220,7 +222,7 @@ repack_ramdisk() {
     fi;
   fi;
   if [ "$packfail" ]; then
-    abort "Repacking ramdisk failed. Aborting...";
+    abort "Repacking ramdisk failed"
   fi;
 
   if [ -f "$bin/mkmtkhdr" -a -f "$split_img/boot.img-base" ]; then
@@ -234,6 +236,8 @@ repack_ramdisk() {
 # flash_boot (build, sign and write image only)
 flash_boot() {
   local varlist kernel ramdisk cmdline part0 part1 nocompflag signfail pk8 cert avbtype;
+
+  ui_print "  • Repacking boot image";
 
   cd $split_img;
   if [ -f "$bin/mkimage" ]; then
@@ -317,7 +321,7 @@ flash_boot() {
     $bin/magiskboot repack $nocompflag $bootimg $home/boot-new.img;
   fi;
   if [ $? != 0 ]; then
-    abort "Repacking image failed. Aborting...";
+    abort "Repacking image failed"
   fi;
 
   cd $home;
@@ -339,15 +343,17 @@ flash_boot() {
     fi;
   fi;
   if [ $? != 0 -o "$signfail" ]; then
-    abort "Signing image failed. Aborting...";
+    abort "Signing image failed"
   fi;
   mv -f boot-new-signed.img boot-new.img 2>/dev/null;
 
   if [ ! -f boot-new.img ]; then
-    abort "No repacked image found to flash. Aborting...";
+    abort "No repacked image found to flash"
   elif [ "$(wc -c < boot-new.img)" -gt "$(wc -c < boot.img)" ]; then
-    abort "New image larger than boot partition. Aborting...";
+    abort "New image larger than boot partition"
   fi;
+
+  ui_print "  • Flashing new boot image";
   if [ -f "$bin/flash_erase" -a -f "$bin/nandwrite" ]; then
     $bin/flash_erase $block 0 0;
     $bin/nandwrite -p $block boot-new.img;
@@ -358,7 +364,7 @@ flash_boot() {
     cat boot-new.img /dev/zero > $block 2>/dev/null || true;
   fi;
   if [ $? != 0 ]; then
-    abort "Flashing image failed. Aborting...";
+    abort "Flashing image failed"
   fi;
 }
 
@@ -377,7 +383,7 @@ flash_dtbo() {
   if [ "$dtbo" ]; then
     dtboblock=/dev/block/bootdevice/by-name/dtbo$slot;
     if [ ! -e "$dtboblock" ]; then
-      abort "dtbo partition could not be found. Aborting...";
+      abort "dtbo partition could not be found"
     fi;
     if [ -f "$bin/flash_erase" -a -f "$bin/nandwrite" ]; then
       $bin/flash_erase $dtboblock 0 0;
@@ -389,12 +395,13 @@ flash_dtbo() {
       cat $dtbo /dev/zero > $dtboblock 2>/dev/null || true;
     fi;
     if [ $? != 0 ]; then
-      abort "Flashing dtbo failed. Aborting...";
+      abort "Flashing dtbo failed"
     fi;
   fi;
 }
 ### write_boot (repack ramdisk then build, sign and write image and dtbo)
 write_boot() {
+  ui_print "  • Repacking ramdisk";
   repack_ramdisk;
   flash_boot;
   flash_dtbo;
@@ -653,7 +660,7 @@ setup_ak() {
         esac;
       fi;
       if [ ! "$slot" -a "$is_slot_device" == 1 ]; then
-        abort "Unable to determine active boot slot. Aborting...";
+        abort "Unable to determine active boot slot"
       fi;
     ;;
   esac;
@@ -676,7 +683,7 @@ setup_ak() {
             if [ "$mtdpart" == "$part" ]; then
               mtdname=$(echo $mtdmount | cut -d: -f1);
             else
-              abort "Unable to determine mtd $block partition. Aborting...";
+              abort "Unable to determine mtd $block partition"
             fi;
             if [ -e /dev/mtd/$mtdname ]; then
               target=/dev/mtd/$mtdname;
@@ -698,7 +705,7 @@ setup_ak() {
       if [ "$target" ]; then
         block=$(ls $target 2>/dev/null);
       else
-        abort "Unable to determine $block partition. Aborting...";
+        abort "Unable to determine $block partition"
       fi;
     ;;
     *)
