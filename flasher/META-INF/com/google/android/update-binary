@@ -42,7 +42,7 @@ cleanup() {
 debugging() {
   case $(basename "$ZIPFILE" .zip) in
     *-debugging)
-      ui_print " " "Creating debugging archive in $DIR...";
+      ui_print "  • Creating debugging archive";
       test -f /tmp/recovery.log && log=/tmp/recovery.log;
       $bb tar -czf "$DIR/anykernel3-$(date +%Y-%m-%d_%H%M%S)-debug.tgz" $home $log;
     ;;
@@ -79,7 +79,7 @@ restore_env() {
   $bb umount -l /dev/random) 2>/dev/null;
 }
 abort() {
-  ui_print "$@";
+  ui_print " " "!! $*; aborting." " ";
   debugging;
   if [ ! -f anykernel.sh -o "$(file_getprop anykernel.sh do.cleanuponabort 2>/dev/null)" == 1 ]; then
     cleanup;
@@ -95,7 +95,7 @@ mkdir -p $home/bin;
 cd $home;
 unzip -o "$ZIPFILE";
 if [ $? != 0 -o ! "$(ls tools)" ]; then
-  abort "Unzip failed. Aborting...";
+  abort "Unzip failed";
 fi;
 for arch32 in x86 arm; do
   if [ -d $home/tools/$arch32 ]; then
@@ -121,13 +121,11 @@ if [ -f banner ]; then
   ui_print " " " ";
 fi;
 
-ui_print "$(file_getprop anykernel.sh kernel.string)";
 if [ -f version ]; then
   ui_print " ";
   ui_printfile version;
   ui_print " ";
 fi;
-ui_print " " "AnyKernel3 by osm0sis @ xda-developers" " " " ";
 
 $BOOTMODE || $bb mount -o bind /dev/urandom /dev/random;
 umount_all;
@@ -176,7 +174,7 @@ elif [ ! "$(getprop ro.product.device 2>/dev/null)" -a ! "$(getprop ro.build.pro
 fi;
 
 if [ "$(file_getprop anykernel.sh do.devicecheck)" == 1 ]; then
-  ui_print "Checking device...";
+  ui_print "  • Checking device";
   device=$(getprop ro.product.device);
   product=$(getprop ro.build.product);
   for testname in $(file_getprop anykernel.sh 'device.name.*'); do
@@ -187,13 +185,13 @@ if [ "$(file_getprop anykernel.sh do.devicecheck)" == 1 ]; then
     fi;
   done;
   if [ ! "$match" ]; then
-    abort " " "Unsupported device. Aborting...";
+    abort "Unsupported device '$device'";
   fi;
 fi;
 
 supported_ver=$(file_getprop anykernel.sh supported.versions | $bb tr -d '[:space:]');
 if [ "$supported_ver" ]; then
-  ui_print "Checking Android version...";
+  ui_print "  • Checking Android version";
   android_ver=$(file_getprop /system/build.prop ro.build.version.release);
   parsed_ver=$(int2ver $android_ver);
   if echo $supported_ver | $bb grep -q '-'; then
@@ -210,10 +208,8 @@ if [ "$supported_ver" ]; then
       fi;
     done;
   fi;
-  if [ "$supported" ]; then
-    ui_print "$android_ver" " ";
-  else
-    abort " " "Unsupported Android version. Aborting...";
+  if [ ! "$supported" ]; then
+    abort "Unsupported Android version $android_ver";
   fi;
 fi;
 
@@ -239,16 +235,16 @@ if [ "$supported_lvl" ]; then
   fi;
 fi;
 
-ui_print "Installing...";
+ui_print "  • Installing kernel";
 core=$($bb grep -oE 'ak.*core.sh' anykernel.sh);
 test -f tools/$core || $bb ln -s $home/tools/ak*-core.sh $home/tools/$core;
 PATH="$home/bin:$PATH" home=$home $bb ash anykernel.sh $2;
 if [ $? != 0 ]; then
-  abort;
+  abort "Failed to execute installer";
 fi;
 
 if [ "$(file_getprop anykernel.sh do.modules)" == 1 ]; then
-  ui_print " " "Pushing modules...";
+  ui_print "  • Pushing modules";
   $bb mount -o rw,remount -t auto /system;
   $bb mount -o rw,remount -t auto /vendor 2>/dev/null;
   cd $home/modules;
@@ -287,4 +283,4 @@ fi;
 
 restore_env;
 
-ui_print " " " " "Done!";
+ui_print "  • Done!";
