@@ -1262,7 +1262,7 @@ static int msm_smem_probe(struct platform_device *pdev)
 	phys_addr_t aux_mem_base;
 	resource_size_t aux_mem_size;
 	int temp_string_size = 11; /* max 3 digit count */
-	char temp_string[temp_string_size];
+	char temp_string[11];
 	int ret;
 	struct ramdump_segment *ramdump_segments_tmp = NULL;
 	struct smem_area *smem_areas_tmp = NULL;
