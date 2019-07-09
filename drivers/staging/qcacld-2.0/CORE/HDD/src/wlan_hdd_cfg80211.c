@@ -17317,7 +17317,7 @@ int __wlan_hdd_cfg80211_scan( struct wiphy *wiphy,
 
     if (request->n_channels)
     {
-       char chList [(request->n_channels*5)+1];
+       char chList [MAX_CHANNEL * 5 + 1];
        int len;
        channelList = vos_mem_malloc(request->n_channels);
        if (NULL == channelList)
@@ -21507,7 +21507,7 @@ static int __wlan_hdd_cfg80211_sched_scan_start(struct wiphy *wiphy,
     num_ch = 0;
     if (request->n_channels)
     {
-        char chList [(request->n_channels*5)+1];
+        char chList [MAX_CHANNEL * 5 + 1];
         int len;
         for (i = 0, len = 0; i < request->n_channels; i++)
         {
