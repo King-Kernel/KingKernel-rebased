@@ -11,10 +11,15 @@ $BOOTMODE && DIR=/sdcard || DIR=$(dirname "$ZIPFILE");
 
 test "$ANDROID_ROOT" || ANDROID_ROOT=/system;
 test "$home" || home=/tmp/anykernel;
+$BOOTMODE && home=/data/local$home
 
 ui_print() {
   until [ ! "$1" ]; do
-    echo -e "ui_print $1\nui_print" > $OUTFD;
+    if $BOOTMODE; then
+      echo "$1";
+    else
+      echo -e "ui_print $1\nui_print" > $OUTFD;
+    fi;
     shift;
   done;
 }
@@ -23,7 +28,7 @@ ui_printfile() {
     ui_print "$line";
   done < $1;
 }
-show_progress() { echo "progress $1 $2" > $OUTFD; }
+show_progress() { $BOOTMODE || echo "progress $1 $2" > $OUTFD; }
 file_getprop() { $bb grep "^$2=" "$1" | $bb cut -d= -f2-; }
 int2ver() {
   if [ "$1" -eq "$1" ] 2>/dev/null; then 
@@ -84,6 +89,7 @@ abort() {
     cleanup;
   fi;
   restore_env;
+  $BOOTMODE || unmount_all;
   exit 1;
 }
 
@@ -237,7 +243,7 @@ fi;
 ui_print "  • Installing kernel";
 core=$($bb grep -oE 'ak.*core.sh' anykernel.sh);
 test -f tools/$core || $bb ln -s $home/tools/ak*-core.sh $home/tools/$core;
-PATH="$home/bin:$PATH" home=$home $bb ash anykernel.sh $2;
+PATH="$home/bin:$PATH" BOOTMODE=$BOOTMODE home=$home $bb ash anykernel.sh $2;
 if [ $? != 0 ]; then
   abort "Failed to execute installer";
 fi;
