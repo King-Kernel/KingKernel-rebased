@@ -138,8 +138,10 @@ ifeq ($(KERNEL_BUILD), 0)
 endif
 
 #Enable Power debugfs feature only if debug_fs is enabled
-ifeq ($(CONFIG_DEBUG_FS), y)
+ifeq ($(CONFIG_ANDROID), y)
 CONFIG_WLAN_POWER_DEBUGFS := y
+
+CFLAGS_wlan_hdd_debugfs.o += -DCONFIG_DEBUG_FS
 endif
 
 ifdef CPTCFG_QCA_CLD_WLAN
