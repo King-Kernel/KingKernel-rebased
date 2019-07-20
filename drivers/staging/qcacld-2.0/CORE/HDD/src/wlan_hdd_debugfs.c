@@ -901,6 +901,9 @@ VOS_STATUS hdd_debugfs_init(hdd_adapter_t *pAdapter)
     hdd_context_t *pHddCtx = WLAN_HDD_GET_CTX(pAdapter);
     pHddCtx->debugfs_phy = debugfs_create_dir(HDD_DEBUGFS_DIRNAME, 0);
 
+    if (IS_ENABLED(CONFIG_BOARD_MARLIN))
+	return wlan_hdd_create_power_stats_file(pAdapter, pHddCtx);
+
     if (NULL == pHddCtx->debugfs_phy)
         return VOS_STATUS_E_FAILURE;
 
