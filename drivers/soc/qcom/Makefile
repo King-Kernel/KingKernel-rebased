@@ -99,3 +99,10 @@ obj-$(CONFIG_MSM_SCM_XPU) += scm-xpu.o
 obj-$(CONFIG_MSM_KERNEL_PROTECT) += kernel_protect.o
 obj-$(CONFIG_MSM_RTB) += msm_rtb-hotplug.o
 obj-$(CONFIG_MSM_REMOTEQDSS) += remoteqdss.o
+
+ifeq ($(CONFIG_ANDROID),y)
+CFLAGS_rpm_stats.o += -DCONFIG_DEBUG_FS
+CFLAGS_rpm_master_stat.o += -DCONFIG_DEBUG_FS
+CFLAGS_rpm_rail_stats.o += -DCONFIG_DEBUG_FS
+CFLAGS_system_stats.o += -DCONFIG_DEBUG_FS
+endif
