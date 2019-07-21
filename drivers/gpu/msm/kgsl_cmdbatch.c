@@ -57,7 +57,9 @@ void kgsl_dump_syncpoints(struct kgsl_device *device,
 {
 	struct kgsl_cmdbatch_sync_event *event;
 	unsigned int i;
+#ifdef CONFIG_SYNC_DEBUG
 	unsigned long flags;
+#endif
 
 	for (i = 0; i < cmdbatch->numsyncs; i++) {
 		event = &cmdbatch->synclist[i];
@@ -80,6 +82,7 @@ void kgsl_dump_syncpoints(struct kgsl_device *device,
 			break;
 		}
 		case KGSL_CMD_SYNCPOINT_TYPE_FENCE:
+#ifdef CONFIG_SYNC_DEBUG
 			spin_lock_irqsave(&event->handle_lock, flags);
 
 			if (event->handle)
@@ -90,6 +93,7 @@ void kgsl_dump_syncpoints(struct kgsl_device *device,
 				dev_err(device->dev, "  fence: invalid\n");
 
 			spin_unlock_irqrestore(&event->handle_lock, flags);
+#endif
 			break;
 		}
 	}
@@ -133,9 +137,11 @@ static void _kgsl_cmdbatch_timer(unsigned long data)
 			spin_lock_irqsave(&event->handle_lock, flags);
 
 			if (event->handle != NULL) {
+#ifdef CONFIG_SYNC_DEBUG
 				dev_err(device->dev, "       [%d] FENCE %s\n",
 				i, event->handle->fence ?
 					event->handle->fence->name : "NULL");
+#endif
 				kgsl_sync_fence_log(event->handle->fence);
 			}
 
@@ -317,8 +323,10 @@ static void kgsl_cmdbatch_sync_fence_func(void *priv)
 
 	kgsl_cmdbatch_sync_expire(event->device, event);
 
+#ifdef CONFIG_SYNC_DEBUG
 	trace_syncpoint_fence_expire(event->cmdbatch,
 		event->handle ? event->handle->name : "unknown");
+#endif
 
 	spin_lock_irqsave(&event->handle_lock, flags);
 
@@ -380,12 +388,16 @@ static int kgsl_cmdbatch_add_sync_fence(struct kgsl_device *device,
 		 * If ret == 0 the fence was already signaled - print a trace
 		 * message so we can track that
 		 */
+#ifdef CONFIG_SYNC_DEBUG
 		if (ret == 0)
 			trace_syncpoint_fence_expire(cmdbatch, "signaled");
+#endif
 
 		return ret;
 	} else {
+#ifdef CONFIG_SYNC_DEBUG
 		trace_syncpoint_fence(cmdbatch, event->handle->name);
+#endif
 		spin_unlock_irqrestore(&event->handle_lock, flags);
 	}
 
