@@ -365,12 +365,15 @@ static int concurrent_policy_time_seq_show(struct seq_file *m, void *v)
 	struct uid_entry *uid_entry;
 	struct cpufreq_policy *policy;
 	struct cpufreq_policy *last_policy = NULL;
-	u32 buf[num_possible_cpus()];
-	u32 uid, time;
+	u32 uid, time, *buf;
 	int i, cnt = 0, num_possible_cpus = num_possible_cpus();
 
 	if (!cpufreq_all_freq_init || !uid_cpupower_enable)
 		return 0;
+
+	buf = kmalloc_array(num_possible_cpus, sizeof(*buf), GFP_KERNEL);
+	if (!buf)
+		return -ENOMEM;
 
 	if (v == uid_hash_table) {
 		for_each_possible_cpu(i) {
@@ -394,6 +397,9 @@ static int concurrent_policy_time_seq_show(struct seq_file *m, void *v)
 		buf[0] = (u32) cnt;
 		seq_write(m, buf, (cnt + 1) * sizeof(*buf));
 	}
+
+	kfree(buf);
+
 	rcu_read_lock();
 
 	hlist_for_each_entry_rcu(uid_entry, (struct hlist_head *)v, hash) {
