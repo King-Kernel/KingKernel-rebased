@@ -425,12 +425,12 @@ limDeferMsg(tpAniSirGlobal pMac, tSirMsgQ *pMsg)
               pMsg->type, pMac->lim.gLimSmeState, pMac->lim.gLimPrevSmeState,
               pMac->lim.gLimSystemRole, pMac->lim.gLimMlmState,
               pMac->lim.gLimPrevMlmState);
-        MTRACE(macTraceMsgRx(pMac, NO_SESSION, LIM_TRACE_MAKE_RXMSG(pMsg->type, LIM_MSG_DEFERRED));)
+        MTRACE(macTraceMsgRx(pMac, NO_SESSION, LIM_TRACE_MAKE_RXMSG(pMsg->type, LIM_MSG_DEFERRED)));
     }
     else
     {
         limLog(pMac, LOG1, FL("Dropped lim message (0x%X)"), pMsg->type);
-        MTRACE(macTraceMsgRx(pMac, NO_SESSION, LIM_TRACE_MAKE_RXMSG(pMsg->type, LIM_MSG_DROPPED));)
+        MTRACE(macTraceMsgRx(pMac, NO_SESSION, LIM_TRACE_MAKE_RXMSG(pMsg->type, LIM_MSG_DROPPED)));
     }
 
     return retCode;
@@ -1235,7 +1235,7 @@ limProcessMessages(tpAniSirGlobal pMac, tpSirMsgQ  limMsg)
        if (limMsg->type != SIR_CFG_PARAM_UPDATE_IND &&
           limMsg->type != SIR_BB_XPORT_MGMT_MSG)
            MTRACE(macTraceMsgRx(pMac, NO_SESSION,
-                 LIM_TRACE_MAKE_RXMSG(limMsg->type, LIM_MSG_PROCESSED));)
+                 LIM_TRACE_MAKE_RXMSG(limMsg->type, LIM_MSG_PROCESSED)));
     }
 
     switch (limMsg->type)

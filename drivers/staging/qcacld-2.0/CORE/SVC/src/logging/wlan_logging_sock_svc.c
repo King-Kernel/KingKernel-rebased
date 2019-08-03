@@ -457,9 +457,11 @@ static int pkt_stats_fill_headers(struct sk_buff *skb)
 	vos_pktlog.version = VERSION_LOG_WLAN_PKT_LOG_INFO_C;
 	vos_pktlog.buf_len = skb->len;
 	vos_pktlog.seq_no = gwlan_logging.pkt_stats_msg_idx++;
+#ifdef FEATURE_WLAN_DIAG_SUPPORT
 	vos_log_set_code(&vos_pktlog, LOG_WLAN_PKT_LOG_INFO_C);
 	vos_log_set_length(&vos_pktlog.log_hdr, skb->len +
 				vos_pkt_size);
+#endif
 
 	if (unlikely(skb_headroom(skb) < vos_pkt_size)) {
 		pr_err("VPKT [%d]: Insufficient headroom, head[%p], data[%p], req[%zu]",

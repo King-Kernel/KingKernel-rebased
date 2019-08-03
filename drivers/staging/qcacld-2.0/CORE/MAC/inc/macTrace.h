@@ -66,22 +66,47 @@ tANI_U8* macTraceGetWdaMsgString( tANI_U16 wdaMsg );
 tANI_U8* macTraceGetSmeMsgString( tANI_U16 smeMsg );
 tANI_U8* macTraceGetModuleString( tANI_U8 moduleId);
 tANI_U8* macTraceGetInfoLogString( tANI_U16 infoLog );
-eHalStatus pe_AcquireGlobalLock( tAniSirLim *psPe);
-eHalStatus pe_ReleaseGlobalLock( tAniSirLim *psPe);
-
-tANI_U8* macTraceGetHDDWlanConnState(tANI_U16 connState);
 
 #ifdef WLAN_FEATURE_P2P_DEBUG
 tANI_U8* macTraceGetP2PConnState(tANI_U16 connState);
 #endif
 
-tANI_U8* macTraceGetNeighbourRoamState(tANI_U16 neighbourRoamState);
-tANI_U8* macTraceGetcsrRoamState(tANI_U16 csrRoamState);
-tANI_U8* macTraceGetcsrRoamSubState(tANI_U16 csrRoamSubState);
-tANI_U8* macTraceGetLimSmeState(tANI_U16 limState);
-tANI_U8* macTraceGetLimMlmState(tANI_U16 mlmState);
-tANI_U8* macTraceGetTLState(tANI_U16 tlState);
 
+#else
+
+#define MAC_TRACE_GET_MODULE_ID(data) 0
+
+static inline tANI_U8* macTraceGetLimSmeState(tANI_U16 limState)
+{
+	return (tANI_U8*)"UNKNOWN";
+}
+static inline tANI_U8* macTraceGetLimMlmState(tANI_U16 mlmState)
+{
+	return (tANI_U8*)"UNKNOWN";
+}
+static inline tANI_U8* macTraceGetTLState(tANI_U16 tlState)
+{
+	return (tANI_U8*)"UNKNOWN";
+}
+static inline tANI_U8* macTraceGetHDDWlanConnState(tANI_U16 connState)
+{
+	return (tANI_U8*)"UNKNOWN";
+}
+static inline tANI_U8* macTraceGetNeighbourRoamState(tANI_U16 neighbourRoamState)
+{
+	return (tANI_U8*)"UNKNOWN";
+}
+static inline tANI_U8* macTraceGetcsrRoamState(tANI_U16 csrRoamState)
+{
+	return (tANI_U8*)"UNKNOWN";
+}
+static inline tANI_U8* macTraceGetcsrRoamSubState(tANI_U16 csrRoamSubState)
+{
+	return (tANI_U8*)"UNKNOWN";
+}
 #endif
+
+eHalStatus pe_AcquireGlobalLock( tAniSirLim *psPe);
+eHalStatus pe_ReleaseGlobalLock( tAniSirLim *psPe);
 
 #endif

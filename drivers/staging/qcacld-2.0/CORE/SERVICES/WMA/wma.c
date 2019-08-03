@@ -8835,8 +8835,10 @@ static VOS_STATUS wma_set_mcc_channel_time_quota
 	struct sAniSirGlobal *pMac = NULL;
 	wmi_resmgr_set_chan_time_quota_cmd_fixed_param *cmdTQ = NULL;
 	wmi_resmgr_chan_time_quota chan_quota;
+#ifdef WLAN_DEBUG
 	u_int32_t channel1 = adapter_1_chan_number;
 	u_int32_t channel2 = adapter_2_chan_number;
+#endif
 	u_int32_t quota_chan1 = adapter_1_quota;
 	/* Knowing quota of 1st chan., derive quota for 2nd chan. */
 	u_int32_t quota_chan2 = 100 - quota_chan1;
@@ -20709,7 +20711,7 @@ static inline void wma_free_wow_ptrn(tp_wma_handle wma, u_int8_t ptrn_id)
 }
 
 /* Converts wow wakeup reason code to text format */
-static const u8 *wma_wow_wake_reason_str(A_INT32 wake_reason, tp_wma_handle wma)
+static const u8 __maybe_unused *wma_wow_wake_reason_str(A_INT32 wake_reason, tp_wma_handle wma)
 {
 	switch (wake_reason) {
 	case WOW_REASON_UNSPECIFIED:
@@ -22342,7 +22344,7 @@ static inline int wma_get_wow_bus_suspend(tp_wma_handle wma) {
 	return adf_os_atomic_read(&wma->is_wow_bus_suspended);
 }
 
-static const u8 *wma_wow_wakeup_event_str(WOW_WAKE_EVENT_TYPE event)
+static const u8 __maybe_unused *wma_wow_wakeup_event_str(WOW_WAKE_EVENT_TYPE event)
 {
 	switch (event) {
 	case WOW_BMISS_EVENT:

@@ -70,7 +70,6 @@
 #include "csrEse.h"
 #endif
 
-#define WLAN_FEATURE_NEIGHBOR_ROAMING_DEBUG 1
 #ifdef WLAN_FEATURE_NEIGHBOR_ROAMING_DEBUG
 #define NEIGHBOR_ROAM_DEBUG smsLog
 #else

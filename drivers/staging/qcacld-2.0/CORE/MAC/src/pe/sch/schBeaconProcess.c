@@ -401,8 +401,8 @@ static void __schBeaconProcessForSession( tpAniSirGlobal      pMac,
 
 
 
-        MTRACE(macTrace(pMac, TRACE_CODE_RX_MGMT_TSF, psessionEntry->peSessionId, pBeacon->timeStamp[0]);)
-        MTRACE(macTrace(pMac, TRACE_CODE_RX_MGMT_TSF, psessionEntry->peSessionId, pBeacon->timeStamp[1]);)
+        MTRACE(macTrace(pMac, TRACE_CODE_RX_MGMT_TSF, psessionEntry->peSessionId, pBeacon->timeStamp[0]));
+        MTRACE(macTrace(pMac, TRACE_CODE_RX_MGMT_TSF, psessionEntry->peSessionId, pBeacon->timeStamp[1]));
 
         /* Read beacon interval session Entry */
         bi = psessionEntry->beaconParams.beaconInterval;
