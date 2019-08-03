@@ -189,8 +189,8 @@ unpack_ramdisk() {
 dump_boot() {
   ui_print "  • Unpacking boot image";
   split_boot;
-  ui_print "  • Unpacking ramdisk";
-  unpack_ramdisk;
+  #ui_print "  • Unpacking ramdisk";
+  #unpack_ramdisk;
 }
 ###
 
@@ -408,8 +408,8 @@ flash_dtbo() {
 }
 ### write_boot (repack ramdisk then build, sign and write image and dtbo)
 write_boot() {
-  ui_print "  • Repacking ramdisk";
-  repack_ramdisk;
+  #ui_print "  • Repacking ramdisk";
+  #repack_ramdisk;
   flash_boot;
   flash_dtbo;
 }
