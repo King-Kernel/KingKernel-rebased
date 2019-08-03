@@ -525,7 +525,6 @@ A_STATUS HTCWaitTarget(HTC_HANDLE HTCHandle)
     A_UINT16 htc_rdy_msg_id;
 
     AR_DEBUG_PRINTF(ATH_DEBUG_TRC, ("HTCWaitTarget - Enter (target:0x%p) \n", HTCHandle));
-    AR_DEBUG_PRINTF(ATH_DEBUG_ANY, ("+HWT\n"));
 
     do {
 
@@ -599,7 +598,6 @@ A_STATUS HTCWaitTarget(HTC_HANDLE HTCHandle)
     } while (FALSE);
 
     AR_DEBUG_PRINTF(ATH_DEBUG_TRC, ("HTCWaitTarget - Exit (%d)\n",status));
-    AR_DEBUG_PRINTF(ATH_DEBUG_ANY, ("-HWT\n"));
     return status;
 }
 
