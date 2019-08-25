@@ -1625,7 +1625,9 @@ struct hdd_context_s
    /* Thermal mitigation information */
    hdd_thermal_mitigation_info_t tmInfo;
 
+#ifdef WLAN_FEATURE_RX_WAKELOCK
    vos_wake_lock_t rx_wake_lock;
+#endif
 
    /*
     * Framework initiated driver restarting
