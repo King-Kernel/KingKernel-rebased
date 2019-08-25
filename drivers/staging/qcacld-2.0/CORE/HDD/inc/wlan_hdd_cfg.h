@@ -3840,10 +3840,14 @@ enum dot11p_mode {
 #define CFG_CH_AVOID_SAP_RESTART_MAX     (1)
 #define CFG_CH_AVOID_SAP_RESTART_DEFAULT (0)
 
+#ifdef WLAN_FEATURE_RX_WAKELOCK
+
 #define CFG_RX_WAKELOCK_TIMEOUT_NAME         "rx_wakelock_timeout"
 #define CFG_RX_WAKELOCK_TIMEOUT_DEFAULT      (50)
 #define CFG_RX_WAKELOCK_TIMEOUT_MIN          (0)
 #define CFG_RX_WAKELOCK_TIMEOUT_MAX          (100)
+
+#endif
 /*
  * In static display use case when APPS is in stand alone power save mode enable
  * active offload mode which helps FW to filter out MC/BC data packets to avoid
@@ -4776,7 +4780,9 @@ struct hdd_config {
    /* parameter to control GTX */
    uint32_t                    tgt_gtx_usr_cfg;
    bool                        sap_restrt_ch_avoid;
+#ifdef WLAN_FEATURE_RX_WAKELOCK
    uint32_t                    rx_wakelock_timeout;
+#endif
    bool                        active_mode_offload;
    uint32_t                    max_sched_scan_plan_interval;
    uint32_t                    max_sched_scan_plan_iterations;
