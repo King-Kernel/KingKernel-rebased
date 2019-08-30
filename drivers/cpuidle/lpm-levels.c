@@ -1119,15 +1119,8 @@ static int lpm_cpuidle_enter(struct cpuidle_device *dev,
 	lpm_stats_cpu_enter(idx, start_time);
 
 	if (!use_psci) {
-		if (idx > 0)
-			update_debug_pc_event(CPU_ENTER, idx, 0xdeaffeed,
-					0xdeaffeed, true);
 		success = msm_cpu_pm_enter_sleep(cluster->cpu->levels[idx].mode,
 				true);
-
-		if (idx > 0)
-			update_debug_pc_event(CPU_EXIT, idx, success,
-							0xdeaffeed, true);
 	} else {
 #ifdef CONFIG_HTC_DEBUG_FOOTPRINT
 		if (level->mode == MSM_PM_SLEEP_MODE_POWER_COLLAPSE)
