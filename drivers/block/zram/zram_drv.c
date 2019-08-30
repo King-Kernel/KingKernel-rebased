@@ -1397,7 +1397,7 @@ static void zram_make_request(struct request_queue *queue, struct bio *bio)
 	}
 
 	__zram_make_request(zram, bio);
-	return BLK_QC_T_NONE;
+	return;
 
 error:
 	bio_io_error(bio);
