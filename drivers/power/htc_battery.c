@@ -1501,7 +1501,7 @@ static void batt_worker(struct work_struct *work)
 #endif // CONFIG_HTC_CHARGER
 		} else {
 			/* WA: QCT  recorgnize D+/D- open charger won't set 500mA. */
-			if ((htc_batt_info.rep.charging_source == POWER_SUPPLY_TYPE_USB)) {
+			if (htc_batt_info.rep.charging_source == POWER_SUPPLY_TYPE_USB) {
 				typec_sink = get_property(htc_batt_info.batt_psy, POWER_SUPPLY_PROP_TYPEC_SINK_CURRENT);
 				if (typec_sink){
 					//Souce type is USB TYPE_C, Ignore WA.
