@@ -31,6 +31,25 @@ set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 ## AnyKernel install
 dump_boot;
 
+# begin ramdisk changes
+
+# If the kernel image and dtbs are separated in the zip
+decomp_image=$home/Image
+comp_image=$decomp_image.lz4
+if [ -f $comp_image ]; then
+  # Hexpatch the kernel if Magisk is installed ('skip_initramfs' -> 'want_initramfs')
+  if [ -d $ramdisk/.backup ]; then
+    ui_print " "; ui_print "• Found Magisk! Patching Kernel"; 
+    $bin/magiskboot decompress $comp_image $decomp_image;
+    $bin/magiskboot hexpatch $decomp_image 736B69705F696E697472616D667300 77616E745F696E697472616D667300;
+    $bin/magiskboot compress=lz4 $decomp_image $comp_image;
+  fi;
+
+  # Concatenate all DTBs to the kernel
+  cat $comp_image $home/dtbs/*.dtb > $comp_image-dtb;
+  rm -f $decomp_image $comp_image
+fi;
+
 write_boot;
 ## end install
 
