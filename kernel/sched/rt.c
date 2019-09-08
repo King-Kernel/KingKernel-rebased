@@ -1640,6 +1640,9 @@ static void check_preempt_curr_rt(struct rq *rq, struct task_struct *p, int flag
 #endif
 }
 
+static inline void sched_rt_update_capacity_req(struct rq *rq)
+{ }
+
 static struct sched_rt_entity *pick_next_rt_entity(struct rq *rq,
 						   struct rt_rq *rt_rq)
 {
