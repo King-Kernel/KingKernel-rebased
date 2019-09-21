@@ -1312,6 +1312,58 @@ config CPUSETS_ASSIST
 
 	  If unsure, say N.
 
+if CPUSETS_ASSIST
+
+config CPUSET_APPLICATION
+	string "Value for 'application' cpuset"
+	default "1,3"
+	help
+	  The CPU mask to use for the application cpuset.
+
+config CPUSET_BG
+	string "Value for 'background' cpuset"
+	default "0-3"
+	help
+	  The CPU mask to use for the background cpuset.
+
+config CPUSET_CAMERA
+	string "Value for 'camera-daemon' cpuset"
+	default "0-3"
+	help
+	  The CPU mask to use for the camera-daemon cpuset.
+
+config CPUSET_FG
+	string "Value for 'foreground' cpuset"
+	default "0-2"
+	help
+	  The CPU mask to use for the foreground cpuset.
+
+config CPUSET_RESTRICTED
+	string "Value for 'restricted' cpuset"
+	default "0-1"
+	help
+	  The CPU mask to use for the restricted cpuset.
+
+config CPUSET_SYSTEM
+	string "Value for 'system' cpuset"
+	default "0,2"
+	help
+	  The CPU mask to use for the system cpuset.
+
+config CPUSET_SYSTEM_BG
+	string "Value for 'system-background' cpuset"
+	default "0-2"
+	help
+	  The CPU mask to use for the system-background cpuset.
+
+config CPUSET_TOP_APP
+	string "Value for 'top-app' cpuset"
+	default "0-3"
+	help
+	  The CPU mask to use for the top-app cpuset.
+
+endif
+
 config SYSFS_DEPRECATED
 	bool "Enable deprecated sysfs features to support old userspace tools"
 	depends on SYSFS
