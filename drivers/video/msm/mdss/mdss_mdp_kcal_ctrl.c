@@ -594,7 +594,9 @@ static int kcal_ctrl_probe(struct platform_device *pdev)
 	mdss_mdp_kcal_update_igc(lut_data);
 	mdss_mdp_kcal_display_commit();
 
+#ifdef CONFIG_KLAPSE
 	lut_cpy = lut_data;
+#endif
 
 	ret = device_create_file(&pdev->dev, &dev_attr_kcal);
 	ret |= device_create_file(&pdev->dev, &dev_attr_kcal_min);
