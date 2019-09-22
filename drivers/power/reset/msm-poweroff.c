@@ -75,7 +75,7 @@ static bool dload_mode_enabled;
 static void *emergency_dload_mode_addr;
 static bool scm_dload_supported;
 
-static bool force_warm_reboot;
+static bool force_warm_reboot=true;
 
 static int dload_set(const char *val, struct kernel_param *kp);
 /* interface for exporting attributes */
