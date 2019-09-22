@@ -75,6 +75,8 @@ static bool dload_mode_enabled;
 static void *emergency_dload_mode_addr;
 static bool scm_dload_supported;
 
+static bool force_warm_reboot;
+
 static int dload_set(const char *val, struct kernel_param *kp);
 /* interface for exporting attributes */
 struct reset_attribute {
@@ -350,8 +352,11 @@ static void msm_restart_prepare(const char *cmd)
 				(htc_restart_cmd_to_type(cmd) == PON_POWER_OFF_WARM_RESET));
 	}
 
+	if (force_warm_reboot)
+		pr_info("Forcing a warm reset of the system\n");
+
 	/* Hard reset the PMIC unless memory contents must be maintained. */
-	if (need_warm_reset) {
+	if (force_warm_reboot || need_warm_reset) {
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_WARM_RESET);
 		is_warm_reset = 1;
 	} else {
@@ -658,6 +663,9 @@ skip_sysfs_create:
 	set_dload_mode(download_mode);
 	if (!download_mode)
 		scm_disable_sdi();
+
+	force_warm_reboot = of_property_read_bool(dev->of_node,
+						"qcom,force-warm-reboot");
 
 	return 0;
 
