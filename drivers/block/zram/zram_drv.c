@@ -46,6 +46,12 @@ static char *default_compressor = CONFIG_ZRAM_DEFAULT_COMP_ALGORITHM;
 
 module_param(default_compressor, charp, 0644);
 
+/* Limit disksize on zram initialization 
+ * 0 = disable
+ */
+static u64 max_disksize_creation = SZ_512M; // 512MB
+
+
 /*
  * We don't need to see memory allocation errors more than once every 1
  * second to know that a problem is occurring.
@@ -1016,7 +1022,11 @@ static ssize_t disksize_store(struct device *dev,
 		err = PTR_ERR(comp);
 		goto out_free_meta;
 	}
-
+	
+	/* filter zram size if zram is limited */
+	if(max_disksize_creation > 512)
+		disksize = min(disksize, max_disksize_creation);
+    
 	zram->comp = comp;
 	zram->disksize = disksize;
 	set_capacity(zram->disk, zram->disksize >> SECTOR_SHIFT);
