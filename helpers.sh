@@ -32,6 +32,10 @@ kmake_flags=(
 # Target device name to use in flashable package names
 device_name="marlin"
 
+# Initialize kernel
+function init_kernel() {
+    git submodule update --init
+}
 # Reset the current config to the committed defconfig
 function mc() {
 	kmake "$defconfig"
