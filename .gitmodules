@@ -1,0 +1,3 @@
+[submodule "flasher"]
+	path = flasher
+	url = https://github.com/King-Kernel/AnyKernel3
