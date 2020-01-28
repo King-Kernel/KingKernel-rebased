@@ -1,0 +1,12 @@
+Kernel: KingKernel-marlin
+Type: RELEASE
+Device: Pixel(xl)
+Compiler: Proton Clang 11.0.0 Jan 2020
+Branch: rebased
+Build Number: v6.6
+
+Changelog:
+- Undo msm_thermal_simple
+- Regenerate defconfig
+- Disable various debugging for a faster experience
+Enjoy :)

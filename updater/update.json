@@ -1,0 +1,13 @@
+{
+  "kernel": {
+    "name": "KingKernel-marlin",
+    "version": "v6.6",
+    "link": "https://github.com/King-Kernel/KingKernel-Releases/raw/marlin/KingKernel_marlin_v6.6.zip",
+    "changelog_url": "https://github.com/King-Kernel/KingKernel-rebased/raw/stable/updater/changelog",
+    "date": "2020-01-28",
+    "sha1": "0f7d84dffff15791187eede4a11ee8c687ea1bcf"
+  },
+  "support": {
+    "link": "https://t.me/kingdevel"
+  }
+}
