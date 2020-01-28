@@ -22,6 +22,12 @@ defconfig="marlin_defconfig"
 # Target architecture
 arch="arm64"
 
+# Folder for kernel source
+ksource="kingkernel-rebased"
+
+# Folder for github stable repo
+rel_folder="KingKernel-Releases"
+
 # Base kernel compile flags (extended by compiler setup script)
 kmake_flags=(
 	-j"$(nproc --all)"
@@ -86,16 +92,12 @@ function kmake() {
 function mkzip() {
     echo "Removing old kernel files"
     echo " "
-    rm -rf flasher/kernel
-    rm -rf flasher/dtbs
-    mkdir flasher/kernel
-    mkdir flasher/dtbs
-    echo "Copying new kernel files"
+    rm -rf flasher/Image.lz4-dtb
+    echo "Copying kernel image"
     echo " "
-    cp out/arch/arm64/boot/Image.lz4 flasher/kernel/Image.lz4
-    cp -r out/arch/arm64/boot/dts/htc/* flasher/dtbs
+    cp out/arch/arm64/boot/Image.lz4-dtb flasher/Image.lz4-dtb
     read -p 'Version number: ' version
-    zipname="KingKernel_v$version.zip"
+    zipname="KingKernel_marlin_v$version.zip"
     echo " "
     cd flasher
     echo "Creating zipfile with name $zipname, please wait..."
@@ -104,4 +106,38 @@ function mkzip() {
     mkdir -p out/flasher
     mv flasher/$zipname out/flasher/$zipname
     echo "Zip successfuly created"
+    echo " "
+    echo "Your zip is stored in out/flasher/$zipname"
+}
+
+# Push to stable release repository
+function push_to_stable() {
+    # Variable for y/n when asking to push
+    local choice
+    
+    if [ ! -d "$HOME/$rel_folder" ]; then
+        echo "Releases repo doesn't exist! Cloning..."
+        git clone git@github.com:King-Kernel/KingKernel-Releases.git $HOME/KingKernel-Releases
+    fi;
+    echo "Copying zipfile..."
+    cd $HOME/$rel_folder
+    git checkout marlin
+    cp $HOME/$ksource/out/flasher/$zipname $HOME/$rel_folder/$zipname
+    while true; do
+        read -p 'Are you sure you want to push? (y or n): ' choice
+        if [ "$choice" == "y" ]; then
+            git add . && git commit -m "Release $version" -s
+            git push
+            break
+        elif [ "$choice" == "n" ]; then
+            echo "aborting..."
+            break
+        else
+            echo "please input either y or n!"
+        fi;
+    done;
+}
+
+function get_sha() {
+    sha1sum "out/flasher/$zipname" | awk '{ print $1 }'
 }
